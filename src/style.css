@@ -107,18 +107,30 @@ input { font: inherit; }
 .strip-next { flex: 1; min-width: 0; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .strip-codec { font-size: 22px; font-weight: 900; color: transparent; -webkit-text-stroke: 1.5px #071006; letter-spacing: .02em; }
 
-/* Panel 2: mode keys and the transport. */
-.modes { display: grid; gap: 12px; }
-.keys { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
-.key { height: 58px; border: 0; border-radius: 16px; background: #262626; color: #8a8a8a; font-size: 10px; box-shadow: inset 0 0 0 2px #151515, inset 0 0 0 3px #333; }
-.key:hover:not(:disabled) { color: #ddd; }
-.key.on { background: var(--lime); color: #000; box-shadow: 0 0 18px rgba(200, 240, 0, .55), inset 0 0 0 2px #7a9400; }
-.key:disabled { background: #171717; color: #3a3a3a; box-shadow: inset 0 0 0 2px #0f0f0f; }
-.transport { display: flex; align-items: center; justify-content: center; gap: 12px; }
-.round { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #3a3a3a; background: #121212; font-size: 16px; display: grid; place-items: center; }
-.round:hover { border-color: #777; }
-.round.play { width: 62px; height: 62px; background: var(--lime); color: #000; border-color: var(--lime); font-size: 22px; box-shadow: 0 0 22px rgba(200, 240, 0, .5); }
-.counter { margin-left: 8px; background: var(--pill); border-radius: 8px; padding: 4px 10px; font-size: 13px; color: var(--muted); } .counter b { color: #fff; font-size: 16px; }
+/* Panel 2: the player, after the user's minimal reference. A light panel like the title plate: the title with a
+   play-count badge, the genre tag, a waveform between the times (shaped and coloured by the album cover, filling
+   as the song plays), and five keys around a round play button. */
+.player { background: #f2f3f0; color: #0b0c0e; border: 0; border-radius: 18px; padding: 14px 20px 12px; display: grid; gap: 8px; }
+.player::after { display: none; }
+.player-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.player-title { flex: 1; min-width: 0; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.player-count { display: inline-flex; align-items: center; gap: 6px; font-size: 20px; font-weight: 800; }
+.player-count svg { width: 20px; height: 20px; }
+.player-tag { justify-self: start; background: #0b0c0e; color: #f2f3f0; border-radius: 999px; padding: 2px 10px; font-size: 10px; font-weight: 700; letter-spacing: .08em; }
+.player-wave-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
+.player-time { font-family: 'Cascadia Code', Consolas, monospace; font-size: 13px; font-weight: 700; }
+.player-wave { height: 34px; display: flex; align-items: center; justify-content: space-between; gap: 1px; cursor: pointer; outline: none; }
+.player-wave:focus-visible { box-shadow: 0 0 0 2px var(--accent); border-radius: 4px; }
+.player-wave i { flex: 0 0 2px; border-radius: 1px; background: #c9cbc6; transition: background .2s; }
+.player-wave i.played { background: var(--accent, #0b0c0e); }
+.player-wave:hover i:not(.played) { background: #b3b6b0; }
+.player-keys { display: flex; align-items: center; justify-content: space-between; padding: 0 12%; }
+.player-key { position: relative; background: none; border: 0; color: #2a2c30; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; }
+.player-key:hover { background: #e2e4df; }
+.player-key.on { color: var(--lime-ink, #0b0c0e); background: var(--lime); }
+.player-key b { position: absolute; right: 6px; bottom: 6px; font-size: 9px; }
+.player-play { width: 56px; height: 56px; border-radius: 50%; border: 0; background: #0b0c0e; color: #f2f3f0; display: grid; place-items: center; box-shadow: 0 6px 16px rgba(0, 0, 0, .25); }
+.player-play svg { width: 24px; height: 24px; fill: currentColor; }
 
 @keyframes spin { to { rotate: 360deg; } }
 

@@ -5,6 +5,7 @@ import { artUrl, buildQueue, clock, nextIndex, onEnded, prevIndex, streamUrl, up
 import { Panels } from './Panels';
 import { haru } from './haru';
 import { NowPlaying } from './NowPlaying';
+import { MediaBar } from './MediaBar';
 import { listen } from './spectrum';
 
 declare global { interface Window { spin: SpinAPI } }
@@ -53,7 +54,6 @@ function Deck({ session, onLogout }: { session: Session; onLogout: () => void })
   const [index, setIndex] = useState(0);
   const [repeat, setRepeat] = useState<Repeat>('off');
   const [shuffle, setShuffle] = useState(false);
-  const [muted, setMuted] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -103,30 +103,15 @@ function Deck({ session, onLogout }: { session: Session; onLogout: () => void })
   const ring = upNext(queue, index, repeat, 1);
   return (
     <div className="shell">
-      <audio ref={audio} crossOrigin="anonymous" muted={muted} onPlay={e => { listen(e.currentTarget); setPlaying(true); }} onPause={() => setPlaying(false)} onTimeUpdate={e => setElapsed(e.currentTarget.currentTime)} onDurationChange={e => setDuration(e.currentTarget.duration)} onEnded={ended} onError={failed} />
+      <audio ref={audio} crossOrigin="anonymous" onPlay={e => { listen(e.currentTarget); setPlaying(true); }} onPause={() => setPlaying(false)} onTimeUpdate={e => setElapsed(e.currentTarget.currentTime)} onDurationChange={e => setDuration(e.currentTarget.duration)} onEnded={ended} onError={failed} />
       <div className="backdrop" style={current ? { backgroundImage: `url("${artUrl(session.server, current)}")` } : undefined} />
       <div className="wordmark" aria-hidden="true">Spin</div>
       <aside className="rail" aria-hidden="true" />
       <main className="left">
-        <NowPlaying session={session} current={current} playing={playing} elapsed={elapsed} duration={duration} upNext={ring[0]?.Name ?? (repeat === 'off' ? 'end of the disc' : '—')} onSeek={seekTo} onLogout={onLogout} />
-        <section className="card modes">
-          <div className="keys">
-            <button className={`key ${shuffle ? 'on' : ''}`} onClick={toggleShuffle}>Shuffle</button>
-            <button className={`key ${repeat === 'all' ? 'on' : ''}`} onClick={() => setRepeat(repeat === 'all' ? 'off' : 'all')}>Repeat</button>
-            <button className={`key ${repeat === 'one' ? 'on' : ''}`} onClick={() => setRepeat(repeat === 'one' ? 'off' : 'one')}>Repeat one</button>
-            <button className="key" disabled>Crossfade</button>
-            <button className="key" disabled>Offline</button>
-            <button className={`key ${muted ? 'on' : ''}`} onClick={() => setMuted(!muted)}>Mute</button>
-          </div>
-          <div className="transport">
-            <button className="round" onClick={prev} aria-label="Previous">⏮</button>
-            <button className="round" onClick={() => seekTo(Math.max(0, elapsed - 10))} aria-label="Back ten seconds">-10</button>
-            <button className="round play" onClick={toggle} aria-label={playing ? 'Pause' : 'Play'}>{playing ? '⏸' : '▶'}</button>
-            <button className="round" onClick={() => seekTo(Math.min(duration, elapsed + 10))} aria-label="Forward ten seconds">+10</button>
-            <button className="round" onClick={next} aria-label="Next">⏭</button>
-            <div className="counter"><b>{queue.length ? index + 1 : 0}</b> / {queue.length}</div>
-          </div>
-        </section>
+        <NowPlaying session={session} current={current} playing={playing} upNext={ring[0]?.Name ?? (repeat === 'off' ? 'end of the disc' : '—')} onLogout={onLogout} />
+        <MediaBar session={session} current={current} playing={playing} elapsed={elapsed} duration={duration} repeat={repeat} shuffle={shuffle}
+          onSeek={seekTo} onToggle={toggle} onPrev={prev} onNext={next} onShuffle={toggleShuffle}
+          onRepeat={() => setRepeat(repeat === 'off' ? 'all' : repeat === 'all' ? 'one' : 'off')} />
       </main>
       <Panels session={session} songs={songs} current={current} onPlay={play} onReload={reload} error={error} />
     </div>

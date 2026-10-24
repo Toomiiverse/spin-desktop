@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import type { Session, Song } from '../electron/jellyfin';
-import { clock } from './transport';
 import { Art, artist } from './App';
 import { HaruStage } from './HaruStage';
 import { read } from './spectrum';
@@ -8,9 +7,9 @@ import { read } from './spectrum';
 // The now-playing card after the user's CD-player reference (a Blue Archive track player), turned 90° to the left:
 // the spectrum display runs down the left edge, Haru's stage beside it lit by the music, the title plate on top,
 // the printed disc half out of the case on the right, and the label strip along the bottom.
-type Props = { session: Session; current?: Song; playing: boolean; elapsed: number; duration: number; upNext?: string; onSeek: (seconds: number) => void; onLogout: () => void };
+type Props = { session: Session; current?: Song; playing: boolean; upNext?: string; onLogout: () => void };
 
-export function NowPlaying({ session, current, playing, elapsed, duration, upNext, onSeek, onLogout }: Props) {
+export function NowPlaying({ session, current, playing, upNext, onLogout }: Props) {
   const card = useRef<HTMLElement>(null);
   const bars = useRef<HTMLCanvasElement>(null);
   useLight(card, bars, playing);
@@ -37,8 +36,6 @@ export function NowPlaying({ session, current, playing, elapsed, duration, upNex
           <div className="artist">{current ? artist(current) : 'Spin · track player'}</div>
         </div>
         <div className="body">
-          <div className="level"><b>{clock(elapsed)}</b> / {clock(duration)}{current && lossless(current) && <span className="max">MAX</span>}</div>
-          <input className="seek" type="range" min={0} max={duration || 0} step={0.1} value={elapsed} style={{ '--p': duration ? `${(elapsed / duration) * 100}%` : '0%' } as React.CSSProperties} onChange={e => onSeek(Number(e.currentTarget.value))} aria-label="Seek" />
           <div className="chips">{current && <><span>{codec(current)}</span>{current.Genres?.[0] && <span>{current.Genres[0]}</span>}</>}</div>
           <Stats song={current} />
         </div>
