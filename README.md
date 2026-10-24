@@ -23,9 +23,9 @@ Pushes build the installer on GitHub Actions (`build.yml`); it is the `Spin-wind
   in Chromium.
 - **The deck's rules** (`src/transport.ts`) are the phone's: next wraps, previous goes back only in the first
   three seconds, repeat off stops at the end of the disc, shuffle keeps the current song first. `npm test` pins them.
-- **Haru** is haru-desktop's SVG renderer, copied: `public/lib/haru-avatar.js` and `public/emotions/*.svg`. Copy
-  them again from haru-desktop's `build/lib` and `build/emotions` when her artwork changes. Because that bundle
-  fetches `/emotions/…`, the packaged app is served from `spin://app/` rather than `file://`.
+- **Haru** is her portrait screen from haru-desktop (the rig on her vertical monitor: `PortraitWindow` and its
+  art), copied verbatim into `haru/` by `node scripts/sync-haru.mjs`. Run it again when her portrait changes.
+  `src/haru.ts` stands in for haru-desktop's bridge and feeds it only a mood and the pointer.
 - **Settings** live in `%APPDATA%\Spin\config.json`; the token is encrypted by Windows (`safeStorage`) and is
   forgotten on a 401.
 - **Playlists** are Jellyfin's. **Add music** searches YouTube Music and SoundCloud through spin-sources, downloads
