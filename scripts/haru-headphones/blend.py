@@ -6,6 +6,21 @@ from PIL import Image, ImageDraw, ImageFilter
 
 orig = Image.open(sys.argv[1]).convert('RGB')
 red = Image.open(sys.argv[2]).convert('RGB').resize(orig.size, Image.LANCZOS)
+
+# A redraw that borrowed the wearing reference's white backdrop gets hers back: near-white reached from the top
+# corners (the line art walls off the silver highlights) becomes her picture's dark grey.
+backdrop = orig.getpixel((1420, 40))
+for seed in [(5, 5), (red.width - 6, 5)]:
+    if sum(red.getpixel(seed)) > 3 * 225: ImageDraw.floodfill(red, seed, backdrop, thresh=40)
+# Greyscale like her (her irises come from the original below), with the grey matched to hers on bare skin.
+grey = np.asarray(red.convert('L')).astype(float)
+skin = [(640, 1120, 760, 1200), (380, 1160, 470, 1240), (990, 1080, 1090, 1160)]  # cheeks and below the nose
+ref_l = np.asarray(orig.convert('L')).astype(float)
+src = np.concatenate([grey[y0:y1, x0:x1].ravel() for x0, y0, x1, y1 in skin]); dst = np.concatenate([ref_l[y0:y1, x0:x1].ravel() for x0, y0, x1, y1 in skin])
+gain = dst.std() / max(src.std(), 1e-3) if src.std() > 4 else 1.0
+grey = np.clip((grey - src.mean()) * gain + dst.mean(), 0, 255) if gain < 3 else np.clip(grey - src.mean() + dst.mean(), 0, 255)
+print(f'skin grey {src.mean():.0f} -> {dst.mean():.0f}')
+red = Image.fromarray(grey.astype(np.uint8)).convert('RGB')
 EYES = np.array([(500, 1012), (985, 932)], float)  # iris centres in portraitRig.ts's bust view
 
 def eyes(im):
@@ -21,7 +36,7 @@ def similarity(src, dst):
     k = d / s; t = complex(*dst[0]) - k * complex(*src[0])
     return k, t
 
-found = eyes(red); seen = eyes(orig)
+found = eyes(Image.open(sys.argv[2]).convert('RGB').resize(orig.size, Image.LANCZOS)); seen = eyes(orig)
 print('original eyes measured', seen.round(), 'rig says', EYES)
 print('redraw eyes', found.round())
 k, t = similarity(found, seen)
