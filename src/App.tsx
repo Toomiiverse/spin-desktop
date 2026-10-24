@@ -3,7 +3,8 @@ import type { SpinAPI } from '../electron/preload';
 import type { Session, Song } from '../electron/jellyfin';
 import { artUrl, buildQueue, clock, nextIndex, onEnded, prevIndex, streamUrl, upNext, type Repeat } from './transport';
 import { Panels } from './Panels';
-import { haru, mountHaru } from './haru';
+import { haru } from './haru';
+import { PortraitWindow } from '../haru/src/PortraitWindow';
 
 declare global { interface Window { spin: SpinAPI } }
 
@@ -61,7 +62,6 @@ function Deck({ session, onLogout }: { session: Session; onLogout: () => void })
   const reload = useCallback(() => window.spin.songs().then(setSongs).catch(reason => setError((reason as Error).message)), []);
   useEffect(() => { void reload(); }, [reload]);
   // Haru on the card: she reacts to the deck, and idles on her own the rest of the time.
-  useEffect(() => { void mountHaru().catch(reason => console.warn('[Haru]', reason)); }, []);
   useEffect(() => { if (current) haru.changed(); }, [current]);
   useEffect(() => { haru.playing(playing); }, [playing]);
 
@@ -108,7 +108,7 @@ function Deck({ session, onLogout }: { session: Session; onLogout: () => void })
       <aside className="rail" aria-hidden="true" />
       <main className="left">
         <section className="card now">
-          <div className="stage" id="stage" />
+          <div className="stage" onClick={haru.tap} title="Haru"><PortraitWindow /></div>
           <div className="info">
             <div className="micro">Now playing <button className="link" onClick={onLogout}>Sign out</button></div>
             <div className="album">{current?.Album ?? '—'}</div>

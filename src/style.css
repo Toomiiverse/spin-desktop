@@ -26,7 +26,10 @@ input { font: inherit; }
 /* Panel 1: Haru and the now-playing card. */
 .now { display: grid; grid-template-columns: 230px 1fr; gap: 12px; height: 380px; }
 .stage { align-self: stretch; margin: -14px 0 -14px -14px; border-radius: 14px 0 0 14px; overflow: hidden; background: linear-gradient(180deg, transparent, rgba(200, 240, 0, .06)); }
-.stage .svg-avatar-canvas { --avatar-size: 215px !important; }
+.stage { position: relative; cursor: pointer; }
+/* Her portrait is built to fill a whole monitor (position: fixed); here it fills the card's stage instead. */
+.stage .portrait { position: absolute; }
+.stage .portrait-caption, .stage .portrait-panels { display: none; }
 .info { display: flex; flex-direction: column; min-width: 0; }
 .micro { font-size: 10px; color: var(--muted); display: flex; justify-content: space-between; }
 .link { background: none; border: 0; color: var(--muted); padding: 0; letter-spacing: inherit; text-transform: inherit; font-weight: inherit; font-size: inherit; } .link:hover { color: var(--lime); }

@@ -1,4 +1,4 @@
 {
   "compilerOptions": { "target": "ES2022", "useDefineForClassFields": true, "lib": ["ES2022", "DOM", "DOM.Iterable"], "skipLibCheck": true, "esModuleInterop": true, "strict": true, "module": "ESNext", "moduleResolution": "Bundler", "resolveJsonModule": true, "isolatedModules": true, "noEmit": true, "jsx": "react-jsx", "allowImportingTsExtensions": true, "types": ["node", "vite/client"] },
-  "include": ["src", "electron/preload.ts"]
+  "include": ["src", "haru/src", "electron/preload.ts"]
 }
