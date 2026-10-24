@@ -19,7 +19,7 @@ input { font: inherit; }
 .rail { background: var(--lime); position: relative;
   background-image: radial-gradient(circle at 9px 50%, #000 4px, transparent 5px), radial-gradient(circle at 39px 50%, #000 4px, transparent 5px); background-size: 48px 22px; background-repeat: repeat-y; }
 .rail::before { content: 'Spin · Cinema · Spin · Cinema · Spin · Cinema · Spin · Cinema'; position: absolute; inset: 0; writing-mode: vertical-rl; color: #000; font-size: 11px; display: flex; align-items: center; padding: 16px 0; white-space: nowrap; overflow: hidden; }
-.left { display: grid; grid-template-rows: auto auto 1fr; gap: 10px; padding: 12px; min-height: 0; }
+.left { display: grid; grid-template-rows: 1fr auto; gap: 10px; padding: 12px; min-height: 0; }
 
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; position: relative; min-height: 0; }
 .card::after { content: ''; position: absolute; top: -1px; right: 22px; width: 56px; height: 6px; background: var(--hazard); border-radius: 0 0 4px 4px; }
@@ -28,7 +28,7 @@ input { font: inherit; }
    chassis with chamfered corners; the spectrum down the left; Haru lit by it; the title plate on top of the info;
    the printed disc half out of the case on the right; the label strip along the bottom. NowPlaying.tsx drives
    --glow, --ly, --sweep and --sv every frame from the music. */
-.now { --chamfer: 26px; display: grid; grid-template-columns: 58px auto minmax(300px, 1fr); grid-template-rows: 1fr auto; padding: 0; height: clamp(400px, 56vh, 640px); overflow: hidden; border: 0;
+.now { --chamfer: 26px; display: grid; grid-template-columns: 58px auto minmax(300px, 1fr); grid-template-rows: 1fr auto; padding: 0; min-height: 400px; overflow: hidden; border: 0;
   background: linear-gradient(160deg, #353941 0%, #23262c 38%, #1a1c21 70%, #131417 100%);
   clip-path: polygon(var(--chamfer) 0, 100% 0, 100% calc(100% - var(--chamfer)), calc(100% - var(--chamfer)) 100%, 0 100%, 0 var(--chamfer));
   box-shadow: inset 0 1px rgba(255, 255, 255, .08), inset 0 0 0 1px #3a3e46; }
@@ -104,7 +104,6 @@ input { font: inherit; }
 /* The label strip, along the bottom like the reference's side strip turned over: logo, small print, up next, codec. */
 .strip { grid-column: 3; position: relative; z-index: 2; display: flex; align-items: center; gap: 12px; height: 38px; padding: 0 calc(var(--chamfer) + 8px) 0 16px; background: linear-gradient(90deg, #c8f000, #7df2c0 55%, #48c8ff); color: #071006; }
 .strip-logo { font-size: 20px; font-weight: 900; font-style: italic; letter-spacing: .04em; }
-.strip-small { font-size: 8px; letter-spacing: .28em; text-transform: uppercase; opacity: .7; white-space: nowrap; }
 .strip-next { flex: 1; min-width: 0; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .strip-codec { font-size: 22px; font-weight: 900; color: transparent; -webkit-text-stroke: 1.5px #071006; letter-spacing: .02em; }
 
@@ -121,21 +120,6 @@ input { font: inherit; }
 .round.play { width: 62px; height: 62px; background: var(--lime); color: #000; border-color: var(--lime); font-size: 22px; box-shadow: 0 0 22px rgba(200, 240, 0, .5); }
 .counter { margin-left: 8px; background: var(--pill); border-radius: 8px; padding: 4px 10px; font-size: 13px; color: var(--muted); } .counter b { color: #fff; font-size: 16px; }
 
-/* Panel 3: the deck, and six discs waiting around it. */
-.deck { container-type: size; --d: min(44cqh, 170px); --r: calc(var(--d) * .78); --s: calc(var(--d) * .36); }
-.deck::before { content: 'Deck'; position: absolute; top: 10px; left: 50%; translate: -50%; background: #c81e1e; color: #fff; font-size: 9px; letter-spacing: .25em; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; z-index: 1; }
-.deck .disc, .deck .satellite { position: absolute; left: 50%; top: 50%; }
-.disc { width: var(--d); height: var(--d); margin: calc(var(--d) / -2); border-radius: 50%; background: radial-gradient(circle, #000 0 13%, var(--pink) 14% 24%, #141414 25%, #1d1d1d 26%, #141414 40%, #1d1d1d 41%, #141414 60%, #1d1d1d 61%, #141414 100%); box-shadow: 0 0 12px rgba(255, 42, 128, .15); animation: spin 6s linear infinite; animation-play-state: paused; }
-.disc.playing { animation-play-state: running; box-shadow: 0 0 34px rgba(255, 42, 128, .5); }
-.disc img, .disc .blank-art { position: absolute; inset: 15%; border-radius: 50%; object-fit: cover; width: 70%; height: 70%; }
-.disc .blank-art { background: var(--pink); }
-.disc::after { content: ''; position: absolute; inset: 42%; border-radius: 50%; background: #000; border: 2px solid #fff; }
-.satellite { width: var(--s); height: var(--s); margin: calc(var(--s) / -2); padding: 0; border: 0; border-radius: 50%; background: radial-gradient(circle, #000 0 18%, #5b3bd1 19% 34%, #111 35%); box-shadow: 0 0 0 2px #2a2a2a; transform: rotate(calc(var(--i) * 60deg - 90deg)) translate(var(--r)) rotate(calc(90deg - var(--i) * 60deg)); transition: box-shadow .2s; }
-.satellite:hover { box-shadow: 0 0 0 2px var(--lime), 0 0 14px rgba(200, 240, 0, .5); }
-.satellite img, .satellite .blank-art { position: absolute; inset: 22%; width: 56%; height: 56%; border-radius: 50%; object-fit: cover; }
-.satellite .blank-art { background: var(--pink); }
-.satellite span { position: absolute; left: 50%; top: 100%; translate: -50% 3px; background: var(--pill); font-size: 9px; padding: 1px 6px; border-radius: 999px; color: #bdbdbd; white-space: nowrap; }
-.track { position: absolute; left: 50%; top: 50%; width: calc(var(--r) * 2); height: calc(var(--r) * 2); margin: calc(var(--r) * -1); border-radius: 50%; border: 2px dashed #262626; pointer-events: none; }
 @keyframes spin { to { rotate: 360deg; } }
 
 /* The library on the right. */

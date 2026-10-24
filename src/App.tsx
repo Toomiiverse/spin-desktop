@@ -100,7 +100,7 @@ function Deck({ session, onLogout }: { session: Session; onLogout: () => void })
   // Chromium cannot decode this one: ask Jellyfin for AAC instead, from the same place.
   const failed = () => { if (!transcoded && current) { const at = audio.current?.currentTime ?? 0; setTranscoded(true); setTimeout(() => seekTo(at), 0); } };
 
-  const ring = upNext(queue, index, repeat, 6);
+  const ring = upNext(queue, index, repeat, 1);
   return (
     <div className="shell">
       <audio ref={audio} crossOrigin="anonymous" muted={muted} onPlay={e => { listen(e.currentTarget); setPlaying(true); }} onPause={() => setPlaying(false)} onTimeUpdate={e => setElapsed(e.currentTarget.currentTime)} onDurationChange={e => setDuration(e.currentTarget.duration)} onEnded={ended} onError={failed} />
@@ -126,15 +126,6 @@ function Deck({ session, onLogout }: { session: Session; onLogout: () => void })
             <button className="round" onClick={next} aria-label="Next">⏭</button>
             <div className="counter"><b>{queue.length ? index + 1 : 0}</b> / {queue.length}</div>
           </div>
-        </section>
-        <section className="card deck">
-          <div className="track" />
-          <div className={`disc ${playing ? 'playing' : ''}`}>{current && <Art session={session} song={current} />}</div>
-          {ring.map((song, i) => (
-            <button key={`${song.Id}-${i}`} className="satellite" style={{ '--i': i } as React.CSSProperties} onClick={() => jump(queue.indexOf(song))} title={song.Name}>
-              <Art session={session} song={song} size={120} /><span>{clock((song.RunTimeTicks ?? 0) / 1e7)}</span>
-            </button>
-          ))}
         </section>
       </main>
       <Panels session={session} songs={songs} current={current} onPlay={play} onReload={reload} error={error} />

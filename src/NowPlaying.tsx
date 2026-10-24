@@ -49,7 +49,7 @@ export function NowPlaying({ session, current, playing, elapsed, duration, upNex
         </div>
       </div>
       <div className="strip">
-        <b className="strip-logo">SPIN</b><span className="strip-small">Trackplayer · Listen</span>
+        <b className="strip-logo">SPIN</b>
         <span className="strip-next">Up next: <b>{upNext}</b></span>
         <b className="strip-codec">{current ? codec(current) : '—'}</b>
       </div>
