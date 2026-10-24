@@ -4,7 +4,8 @@ import type { Session, Song } from '../electron/jellyfin';
 import { artUrl, buildQueue, clock, nextIndex, onEnded, prevIndex, streamUrl, upNext, type Repeat } from './transport';
 import { Panels } from './Panels';
 import { haru } from './haru';
-import { HaruStage } from './HaruStage';
+import { NowPlaying } from './NowPlaying';
+import { listen } from './spectrum';
 
 declare global { interface Window { spin: SpinAPI } }
 
@@ -102,25 +103,12 @@ function Deck({ session, onLogout }: { session: Session; onLogout: () => void })
   const ring = upNext(queue, index, repeat, 6);
   return (
     <div className="shell">
-      <audio ref={audio} muted={muted} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onTimeUpdate={e => setElapsed(e.currentTarget.currentTime)} onDurationChange={e => setDuration(e.currentTarget.duration)} onEnded={ended} onError={failed} />
+      <audio ref={audio} crossOrigin="anonymous" muted={muted} onPlay={e => { listen(e.currentTarget); setPlaying(true); }} onPause={() => setPlaying(false)} onTimeUpdate={e => setElapsed(e.currentTarget.currentTime)} onDurationChange={e => setDuration(e.currentTarget.duration)} onEnded={ended} onError={failed} />
       <div className="backdrop" style={current ? { backgroundImage: `url("${artUrl(session.server, current)}")` } : undefined} />
       <div className="wordmark" aria-hidden="true">Spin</div>
       <aside className="rail" aria-hidden="true" />
       <main className="left">
-        <section className="card now">
-          <HaruStage />
-          <div className="info">
-            <div className="micro">Now playing <button className="link" onClick={onLogout}>Sign out</button></div>
-            <div className="album">{current?.Album ?? '—'}</div>
-            <h1 className="title">{current?.Name ?? 'Nothing on the deck'}</h1>
-            <div className="artist">{current ? artist(current) : 'Pick a song on the right'}</div>
-            <div className="level"><b>{clock(elapsed)}</b> / {clock(duration)}{current && lossless(current) && <span className="max">MAX</span>}</div>
-            <input className="seek" type="range" min={0} max={duration || 0} step={0.1} value={elapsed} style={{ '--p': duration ? `${(elapsed / duration) * 100}%` : '0%' } as React.CSSProperties} onChange={e => seekTo(Number(e.currentTarget.value))} aria-label="Seek" />
-            <div className="chips">{current && <><span>{codec(current)}</span>{current.Genres?.[0] && <span>{current.Genres[0]}</span>}</>}</div>
-            <Stats song={current} />
-            <div className="footer">Up next: <b>{ring[0]?.Name ?? (repeat === 'off' ? 'end of the disc' : '—')}</b></div>
-          </div>
-        </section>
+        <NowPlaying session={session} current={current} playing={playing} elapsed={elapsed} duration={duration} upNext={ring[0]?.Name ?? (repeat === 'off' ? 'end of the disc' : '—')} onSeek={seekTo} onLogout={onLogout} />
         <section className="card modes">
           <div className="keys">
             <button className={`key ${shuffle ? 'on' : ''}`} onClick={toggleShuffle}>Shuffle</button>
@@ -159,23 +147,4 @@ export function Art({ session, song, size = 600 }: { session: Session; song: Son
   const src = artUrl(session.server, song, size);
   useEffect(() => setBroken(false), [src]);
   return broken ? <span className="blank-art" /> : <img src={src} alt="" onError={() => setBroken(true)} />;
-}
-
-const stream = (song: Song) => song.MediaSources?.[0]?.MediaStreams?.find(s => s.Type === 'Audio');
-const codec = (song: Song) => (stream(song)?.Codec ?? song.MediaSources?.[0]?.Container ?? '?').toUpperCase();
-const lossless = (song: Song) => ['flac', 'alac', 'wav', 'aiff', 'pcm'].includes(stream(song)?.Codec ?? '');
-function Stats({ song }: { song?: Song }) {
-  const source = song?.MediaSources?.[0];
-  const audio = song && stream(song);
-  const rows: [string, string, boolean?][] = [
-    ['Bitrate', audio?.BitRate || source?.Bitrate ? `${Math.round((audio?.BitRate || source?.Bitrate || 0) / 1000)} kbps` : '—', true],
-    ['Sample rate', audio?.SampleRate ? `${(audio.SampleRate / 1000).toFixed(1)} kHz` : '—'],
-    ['Year', song?.ProductionYear ? String(song.ProductionYear) : '—'],
-    ['Track', song?.IndexNumber ? String(song.IndexNumber) : '—'],
-    ['Size', source?.Size ? `${(source.Size / 1048576).toFixed(1)} MB` : '—'],
-    ['Channels', audio?.Channels ? String(audio.Channels) : '—'],
-    ['Added', song?.DateCreated ? song.DateCreated.slice(0, 10) : '—'],
-    ['Quality', song ? (lossless(song) ? 'MAX' : 'A') : '—'],
-  ];
-  return <div className="stats">{rows.map(([label, value, hot]) => <div key={label} className={`pill ${hot ? 'hot' : ''}`}><span>{label}</span><b>{value}</b></div>)}</div>;
 }
