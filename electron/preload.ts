@@ -9,7 +9,8 @@ const invoke = (name: string) => (...args: unknown[]) =>
   });
 
 type Bridge = { [K in keyof MainAPI]: MainAPI[K] };
-const names: (keyof MainAPI)[] = ['session', 'login', 'logout', 'songs', 'playlists', 'playlistItems', 'createPlaylist', 'addToPlaylist', 'removeFromPlaylist', 'deletePlaylist'];
+const names: (keyof MainAPI)[] = ['session', 'login', 'logout', 'songs', 'playlists', 'playlistItems', 'createPlaylist', 'addToPlaylist', 'removeFromPlaylist', 'deletePlaylist',
+  'search', 'addJob', 'jobs', 'clearJobs', 'addSoundcloud', 'soundcloudJobs', 'clearSoundcloud', 'refreshLibrary', 'editItem', 'deleteItem', 'pickArt'];
 const api = Object.fromEntries(names.map(name => [name, invoke(name)])) as Bridge;
 
 export type SpinAPI = Bridge;

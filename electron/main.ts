@@ -1,9 +1,10 @@
-import { app, BrowserWindow, ipcMain, Menu, net, protocol, safeStorage } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Menu, net, protocol, safeStorage } from 'electron';
 import { randomUUID } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { jellyfin, type Session } from './jellyfin';
+import { sources } from './sources';
 
 // The built page is served from its own origin rather than file://: Haru's renderer fetches her faces from
 // /emotions/, and fetch() has no file:// support.
@@ -25,6 +26,7 @@ let settings: Settings;
 let token = '';
 const session = (): Session => ({ server: settings.server ?? '', userId: settings.userId ?? '', deviceId: settings.deviceId, token });
 const server = jellyfin(session);
+const adding = sources(session);
 
 function createWindow() {
   const window = new BrowserWindow({
@@ -68,6 +70,24 @@ const api = {
   addToPlaylist: guarded(server.addToPlaylist),
   removeFromPlaylist: guarded(server.removeFromPlaylist),
   deletePlaylist: guarded(server.deletePlaylist),
+  search: adding.search,
+  addJob: adding.addJob,
+  jobs: adding.jobs,
+  clearJobs: adding.clearJobs,
+  addSoundcloud: adding.addSoundcloud,
+  soundcloudJobs: adding.soundcloudJobs,
+  clearSoundcloud: adding.clearSoundcloud,
+  refreshLibrary: guarded(adding.refreshLibrary),
+  editItem: guarded(adding.editItem),
+  deleteItem: guarded(adding.deleteItem),
+  // The cover comes off this disk: picked and read here, so the bytes never cross into the sandbox.
+  async pickArt(id: string) {
+    const picked = await dialog.showOpenDialog({ title: 'Cover art', filters: [{ name: 'JPEG or PNG', extensions: ['jpg', 'jpeg', 'png'] }], properties: ['openFile'] });
+    const file = picked.filePaths[0];
+    if (!file) return false;
+    await guarded(adding.setArt)(id, readFileSync(file), file.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg');
+    return true;
+  },
 };
 export type MainAPI = typeof api;
 
