@@ -4,7 +4,7 @@ import type { Session, Song } from '../electron/jellyfin';
 import { artUrl, buildQueue, clock, nextIndex, onEnded, prevIndex, streamUrl, upNext, type Repeat } from './transport';
 import { Panels } from './Panels';
 import { haru } from './haru';
-import { PortraitWindow } from '../haru/src/PortraitWindow';
+import { HaruStage } from './HaruStage';
 
 declare global { interface Window { spin: SpinAPI } }
 
@@ -108,7 +108,7 @@ function Deck({ session, onLogout }: { session: Session; onLogout: () => void })
       <aside className="rail" aria-hidden="true" />
       <main className="left">
         <section className="card now">
-          <div className="stage" onClick={haru.tap} title="Haru"><PortraitWindow /></div>
+          <HaruStage />
           <div className="info">
             <div className="micro">Now playing <button className="link" onClick={onLogout}>Sign out</button></div>
             <div className="album">{current?.Album ?? '—'}</div>
